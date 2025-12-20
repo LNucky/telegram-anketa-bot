@@ -1,0 +1,12 @@
+services:
+  bot:
+    build: .
+    container_name: telegram-bot
+    env_file:
+      - .env
+    command: sh -c "alembic upgrade head && python main.py"
+    depends_on:
+      - postgres
+    networks:
+      - telegram-network
+    restart: unless-stopped
