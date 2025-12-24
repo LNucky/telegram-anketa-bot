@@ -13,9 +13,9 @@ class UserRepository(BaseRepository[User]):
         super().__init__(session, User)
 
     async def get_by_telegram_id(self, telegram_id: int) -> Optional[User]:
-        """Получить пользователя по Telegram ID."""
+        """Получить активного пользователя по Telegram ID."""
         result = await self.session.execute(
-            select(User).where(User.telegram_id == telegram_id)
+            select(User).where(User.telegram_id == telegram_id, User.is_active == True)
         )
         return result.scalar_one_or_none()
 

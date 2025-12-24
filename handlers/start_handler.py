@@ -3,7 +3,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from handlers.states import FSMState
-from config import ADMIN_IDS
+from config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.repositories import UserRepository, FormRepository
 from openpyxl import Workbook
@@ -31,7 +31,7 @@ async def start_handler(message: Message, state: FSMContext, session: AsyncSessi
 @router.message(Command("admin"))
 async def admin_handler(message: Message, state: FSMContext, session: AsyncSession):
     await state.clear()
-    if message.from_user.id in ADMIN_IDS:
+    if message.from_user.id in settings.admin_ids:
         # Получаем все анкеты с авторами из БД
         form_repo = FormRepository(session)
         forms = await form_repo.get_all_with_authors()

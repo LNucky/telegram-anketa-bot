@@ -1,15 +1,24 @@
-import os
-import dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-dotenv.load_dotenv()
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_IDS = [int(admin_id) for admin_id in os.getenv("ADMIN_IDS").split(",")]
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
-POSTGRES_DB=os.getenv("POSTGRES_DB")
-POSTGRES_HOST=os.getenv("POSTGRES_HOST")
-POSTGRES_PORT=os.getenv("POSTGRES_PORT")
-POSTGRES_USER=os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD=os.getenv("POSTGRES_PASSWORD")
+    bot_token: str
+    admin_ids: list[int]
 
-DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    postgres_db: str
+    postgres_host: str = "localhost"
+    postgres_port: int = 5432
+    postgres_user: str
+    postgres_password: str
+
+    @property
+    def database_url(self) -> str:
+        return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+
+
+settings = Settings()

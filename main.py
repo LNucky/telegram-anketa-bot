@@ -1,24 +1,23 @@
-from config import BOT_TOKEN, DATABASE_URL
-from aiogram import Dispatcher, Bot
-from handlers.start_handler import router as start_router
-from handlers.message_handler import router as message_router
 import asyncio
+
+from aiogram import Dispatcher, Bot
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+
+from config import settings
+from handlers.routers import routers_list
 from middlewares.db import DbSessionMiddleware
 
 
-
 async def main():
-    engine = create_async_engine(url=DATABASE_URL, echo=True)
+    engine = create_async_engine(url=settings.database_url, echo=True)
     sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
 
-    bot = Bot(BOT_TOKEN)
+    bot = Bot(settings.bot_token)
     dp = Dispatcher()
 
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
 
-    dp.include_router(start_router)
-    dp.include_router(message_router)
+    dp.include_routers(*routers_list)
 
     await dp.start_polling(bot)
 
